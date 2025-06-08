@@ -1,5 +1,6 @@
 import { User } from "../Models/user.js";
-export const UserRagister =async (req, res) => {
+import jwt from 'jsonwebtoken'
+export const UserRagister = async (req, res) => {
     const { UserId, email, phone, password } = req.body;
     const findOldUser = await User.findOne({
         $or: [
@@ -18,12 +19,20 @@ export const UserRagister =async (req, res) => {
     })
     res.status(200).json({ massage: "New User Ragister successfully", newUser });
 }
-export const userLogin=async (req, res) => {
+export const userLogin = async (req, res) => {
     const { UserId, password } = req.body
     const findUserForLogin = await User.findOne({ UserId });
     if (findUserForLogin) {
         if (findUserForLogin.password == password) {
-            res.status(200).json({ massage: `Welcome back ${findUserForLogin.UserId} `, findUserForLogin });
+            const token = jwt.sign({ UserId }, 'zxcvbnm',{ expiresIn: '1h' })
+
+            res.cookie('token',token,{
+                httpOnly:true,
+                secure:false,
+                sameSite:'Strict',
+                maxAge: 3600000  
+            })
+            res.status(200).json({ massage: `Welcome back ${findUserForLogin.UserId} `, token });
         } else {
             res.json({ massage: "Password is incorect" });
         }
