@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Login</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ff416c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #e5385b;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="userId" placeholder="User ID" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+            <div class="message" id="message"></div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const UserId = document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch('/api/login', {  // adjust route if needed
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ UserId, password }),
+                    credentials: 'include' // important to send/receive cookies
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('username', UserId);
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.massage;
+                    // You can redirect user after login success, e.g. dashboard
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html'; // change to your page
+                    }, 2000);
+                } else {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = data.massage || 'Login failed';
+                }
+            } catch (err) {
+                messageDiv.style.color = 'red';
+                messageDiv.textContent = 'Something went wrong, try again';
+            }
+        });
+    </script>
+</body>
+
+</html>

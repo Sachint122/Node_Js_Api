@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        button {
+            margin: 10px 10px 10px 0;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .form-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            margin: 8px 0;
+            padding: 8px;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 id="welcomeMsg">Welcome back, User</h1>
+
+    <button id="btnAdd">Add Contact</button>
+    <button id="btnUpdate">Update Contact</button>
+    <button id="btnDelete">Delete Contact</button>
+
+    <div id="formArea"></div>
+    <div id="message" class="message"></div>
+
+    <script>
+        const username = localStorage.getItem('username') || 'User';
+        document.getElementById('welcomeMsg').textContent = `Welcome back, ${username}`;
+
+        const formArea = document.getElementById('formArea');
+        const messageDiv = document.getElementById('message');
+
+        // Clear form and message helper
+        function clearUI() {
+            formArea.innerHTML = '';
+            messageDiv.textContent = '';
+        }
+
+        // Add Contact Form & Logic
+        function addContactForm() {
+            clearUI();
+            formArea.innerHTML = `
+        <div class="form-section">
+          <h3>Add Contact</h3>
+          <input type="text" id="name" placeholder="Name" required />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="text" id="phone" placeholder="Phone" required />
+          <select id="type">
+            <option value="personal">Personal</option>
+            <option value="professional">Professional</option>
+          </select>
+          <button id="submitAdd">Add Contact</button>
+        </div>
+      `;
+
+            document.getElementById('submitAdd').onclick = async () => {
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const type = document.getElementById('type').value;
+
+                if (!name || !email || !phone) {
+                    messageDiv.textContent = 'Please fill all required fields.';
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/api/contact/add', {  // Adjust your add route
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone, type, author: username }),
+                    });
+                    const data = await res.json();
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.massage || 'Contact added!';
+                } catch (err) {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = 'Failed to add contact.';
+                }
+            }
+        }
+
+        // Update Contact Form & Logic
+        function updateContactForm() {
+            clearUI();
+            formArea.innerHTML = `
+        <div class="form-section">
+          <h3>Update Contact</h3>
+          <input type="text" id="phoneToUpdate" placeholder="Phone of contact to update" required />
+          <input type="text" id="newName" placeholder="New Name" />
+          <input type="email" id="newEmail" placeholder="New Email" />
+          <select id="newType">
+            <option value="">Select Type</option>
+            <option value="personal">Personal</option>
+            <option value="professional">Professional</option>
+          </select>
+          <button id="submitUpdate">Update Contact</button>
+        </div>
+      `;
+
+            document.getElementById('submitUpdate').onclick = async () => {
+                const phone = document.getElementById('phoneToUpdate').value.trim();
+                const name = document.getElementById('newName').value.trim();
+                const email = document.getElementById('newEmail').value.trim();
+                const type = document.getElementById('newType').value;
+
+                if (!phone) {
+                    messageDiv.textContent = 'Phone is required to identify contact.';
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/api/contact/update/${phone}`, {  // Your update route
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, type, author: username }),
+                    });
+                    const data = await res.json();
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.massage || 'Contact updated!';
+                } catch (err) {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = 'Failed to update contact.';
+                }
+            }
+        }
+
+        // Delete Contact Form & Logic
+        function deleteContactForm() {
+            clearUI();
+            formArea.innerHTML = `
+        <div class="form-section">
+          <h3>Delete Contact</h3>
+          <input type="text" id="nameToDelete" placeholder="Name of contact to delete" required />
+          <button id="submitDelete">Delete Contact</button>
+        </div>
+      `;
+
+            document.getElementById('submitDelete').onclick = async () => {
+                const name = document.getElementById('nameToDelete').value.trim();
+
+                if (!name) {
+                    messageDiv.textContent = 'Name is required to delete contact.';
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/api/contact/delete/${name}`, {  // Your delete route
+                        method: 'DELETE',
+                    });
+                    const data = await res.json();
+                    messageDiv.style.color = 'green';
+                    messageDiv.textContent = data.massage || 'Contact deleted!';
+                } catch (err) {
+                    messageDiv.style.color = 'red';
+                    messageDiv.textContent = 'Failed to delete contact.';
+                }
+            }
+        }
+        // Button event listeners
+        document.getElementById('btnAdd').onclick = addContactForm;
+        document.getElementById('btnUpdate').onclick = updateContactForm;
+        document.getElementById('btnDelete').onclick = deleteContactForm;
+
+    </script>
+</body>
+
+</html>
