@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Register</title>
   <style>
     * {
@@ -24,7 +25,7 @@
       background: white;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       width: 100%;
       max-width: 400px;
     }
@@ -66,8 +67,14 @@
       margin-top: 15px;
       font-weight: bold;
     }
+    a{
+      text-decoration: none;
+      color: red;
+      font-weight: 600;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h2>User Registration</h2>
@@ -77,6 +84,7 @@
       <input type="text" id="phone" placeholder="Phone Number" required />
       <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Register</button>
+      <a href="login.html">If You Have Already Account Than Please Click me For Login</a>
       <div class="message" id="message"></div>
     </form>
   </div>
@@ -106,11 +114,12 @@
       messageDiv.style.color = data.error ? 'red' : 'green';
 
       if (!data.error) {
-      setTimeout(() => {
-        window.location.href = '/login.html';
-      }, 3000);
-    }
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 3000);
+      }
     });
   </script>
 </body>
+
 </html>
