@@ -6,12 +6,16 @@ import { UserRagister, userLogin } from './Controlar/userControl.js';
 import router from './routes/Contact.js';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
+import { config } from 'dotenv';
+import cors from 'cors'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// .env setup
+config({path:'.env'})
 mongoose.connect(
-    "mongodb+srv://sachintiwari751858:eCzPGEAKdxZCBVtu@cluster0.wiqjxa0.mongodb.net/",
+   process.env.Mongourl,
     {
         "dbName": "Backend_node_js"
     }
@@ -19,6 +23,12 @@ mongoose.connect(
 
 const app = express();
 // middleware
+//cors
+app.use(cors({
+    origin:true,
+    methods:['GET','POST','PUT','DELETE'],
+    credentials:true
+}))
 app.use(bodyParser.json())
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname,'public')));
